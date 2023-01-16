@@ -452,6 +452,10 @@ def main():
         final_acc = correct / instances_num
 
         print('##########')
+        if is_test:
+            print("Test result:")
+        else:
+            print("Dev result:")
         print("Acc. (Correct/Total): {:.4f} ({}/{}) ".format(correct / len(dataset), correct, len(dataset)))
         print("F1. {}".format(final_f1))
         print('precision: {}'.format(final_precision))
@@ -476,11 +480,13 @@ def main():
         # 记录此次实验的结果到result.txt文件中
         with open('./log/result.txt', 'a') as f:
             # 写入实验时间
-            f.write("#" * 30)
+            # f.write("#" * 30 + "\n")
+            f.write("test" + " result:\n" if is_test else "")
             f.write('time: ' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
             for key, value in eval_result.items():
                 f.write('{}: {}\t'.format(key, value))
-            f.write("#" * 30 + "\n")
+            f.write('\n')
+            # f.write("#" * 30 + "\n")
 
         # 以json文件的形式保存每一次的实验结果
         if not os.path.exists('./log/best_result.json'):
@@ -526,6 +532,9 @@ def main():
         postag_ids = None
 
     train_steps = int(instances_num * args.epochs_num / batch_size) + 1
+
+    if not os.path.exists("./log"):
+        os.mkdir("./log")
 
     print("Batch size: ", batch_size)
     print("The number of training instances:", instances_num)
@@ -583,9 +592,9 @@ def main():
             save_model(model, args.output_model_path)
         else:
             continue
-
-        print("Start evaluation on test dataset.")
-        evaluate(args, True)
+        # only test on test dataset when the model train finished.
+        # print("Start evaluation on test dataset.")
+        # evaluate(args, True)
 
     # Evaluation phase.
     print("Final evaluation on the test dataset.")
